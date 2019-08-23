@@ -41,7 +41,6 @@ def delete_Category(id):
             sql = f"DELETE FROM categories WHERE id ='{id}'"
             cursor.execute(sql)
             conn.commit()
-            id = cursor.lastrowid
             response.status = 201
             code = 201
             status = "SUCCESS"
@@ -49,3 +48,13 @@ def delete_Category(id):
     except Exception as e:
         return json.dumps({"STATUS": "ERROR", "CODE": 500, "MSG": repr(e)})
 
+
+def list_categories():
+    try:
+        with conn.cursor() as cursor:
+            sql = "SELECT * FROM categories"
+            result = cursor.execute(sql)
+            print(result)
+            return json.dumps({"STATUS": "SUCCESS", "CATEGORIES": result, "CODE": 200})
+    except Exception as e:
+        return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})

@@ -8,6 +8,10 @@ from db import db
 def admin_portal():
 	return template("pages/admin.html")
 
+@get("/categories")
+def list_categories():
+    return db.list_categories()
+
 @post("/category")
 def add_category():
     name = request.forms.get("name")
