@@ -36,7 +36,12 @@ def add_or_edit_product():
     else:
         favourite = 1
     
-    return db.add_product(id=id, title=title, desc=desc, price=price, img_url=img_url, category=category, favourite=favourite)
+    return db.add_product(id=id, title=title, desc=desc, price=price, img_url=img_url, category=category, \
+                          favourite=favourite)
+
+@get("/product/<id:int>")
+def get_product(id):
+    return db.get_product(id)
 
 @get("/")
 def index():

@@ -15,7 +15,6 @@ def add_category(name):
         with conn.cursor() as cursor:
             sql = f"SELECT name FROM categories WHERE name = '{name}'"
             result = cursor.execute(sql)
-            print(result)
             if result:
                 return json.dumps({"STATUS": "ERROR", "CODE": 200, "MSG": "Category already exists"})
             sql = f"INSERT INTO categories (name) VALUES ('{name}')"
@@ -35,7 +34,6 @@ def delete_Category(id):
         with conn.cursor() as cursor:
             sql = f"SELECT id FROM categories WHERE id = '{id}'"
             result = cursor.execute(sql)
-            print(result)
             if not result:
                 return json.dumps({"STATUS": "ERROR", "CODE": 404, "MSG": "Category not found"})
             sql = f"DELETE FROM categories WHERE id ='{id}'"
@@ -53,8 +51,9 @@ def list_categories():
     try:
         with conn.cursor() as cursor:
             sql = "SELECT * FROM categories"
-            result = cursor.execute(sql)
-            print(result)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+
             return json.dumps({"STATUS": "SUCCESS", "CATEGORIES": result, "CODE": 200})
     except Exception as e:
         return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})
@@ -91,6 +90,22 @@ def add_product(**fields):
                     sql = f"""UPDATE products SET {key} = '{value}' WHERE id = '{fields["id"]}' """ 
                     cursor.execute(sql)
                     conn.commit()
+
+    except Exception as e:
+        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
+
+
+def get_product(id):
+    try:
+        with conn.cursor() as cursor:
+            query = f"""SELECT * FROM products WHERE id = '{id}'"""
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+            if not result:
+                return json.dumps({"STATUS": "ERROR", "MSG": "Product npt found", "CODE": 404})
+            else:
+                return json.dumps({"STATUS": "SUCCESS", "PRODUCT": result, "CODE": 200})
 
     except Exception as e:
         return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
