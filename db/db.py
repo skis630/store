@@ -58,3 +58,39 @@ def list_categories():
             return json.dumps({"STATUS": "SUCCESS", "CATEGORIES": result, "CODE": 200})
     except Exception as e:
         return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})
+
+
+def add_product(**fields):
+    try:
+        with conn.cursor() as cursor:
+            sql = f"""SELECT * FROM categories WHERE id = '{fields["category"]}'"""
+            cat_exists = cursor.execute(sql)
+            if not cat_exists:
+                return json.dumps({"STATUS": "ERROR", "MSG": "Category not found", "CODE": 404})
+
+            if not fields["title"] or not fields["desc"] or not fields["price"] or \
+               not fields["img_url"] or not fields["favourite"]:
+                return json.dumps({"STATUS": "ERROR", "MSG": "missing parameters", "CODE": 400})
+
+            sql = f"""SELECT * FROM products WHERE id = '{fields["id"]}'"""
+            result = cursor.execute(sql)
+
+            if not result:
+                print(fields["favourite"])
+                sql = f"""INSERT INTO products (title, descr, price, img_url, category, favourite) 
+                            VALUES ('{fields["title"]}', '{fields["desc"]}', '{fields["price"]}',
+                                    '{fields["img_url"]}', '{fields["category"]}', '{fields["favourite"]}')
+                        """ 
+                cursor.execute(sql)
+                conn.commit()
+                response.status = 201
+                return json.dumps({"STATUS": "SUCCESS", "PRODUCT_ID": cursor.lastrowid, "CODE": 201})
+
+            else:
+                for key, value in fields.items():
+                    sql = f"""UPDATE products SET {key} = '{value}' WHERE id = '{fields["id"]}' """ 
+                    cursor.execute(sql)
+                    conn.commit()
+
+    except Exception as e:
+        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})

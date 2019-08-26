@@ -21,6 +21,23 @@ def add_category():
 def delete_category(id):
     return db.delete_Category(id)
 
+@post("/product")
+def add_or_edit_product():
+    id = request.forms.get("id")
+    title = request.forms.get("title")
+    desc = request.forms.get("desc")
+    price = request.forms.get("price")
+    img_url = request.forms.get("img_url")
+    category = request.forms.get("category")
+    favourite = request.forms.get("favorite")
+
+    if not favourite:
+        favourite = 0
+    else:
+        favourite = 1
+    
+    return db.add_product(id=id, title=title, desc=desc, price=price, img_url=img_url, category=category, favourite=favourite)
+
 @get("/")
 def index():
     return template("index.html")
