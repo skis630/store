@@ -62,22 +62,21 @@ def list_categories():
 def add_product(**fields):
     try:
         with conn.cursor() as cursor:
-            sql = f"""SELECT * FROM categories WHERE id = '{fields["category"]}'"""
+            sql = f"""SELECT * FROM categories WHERE id = {fields["category"]}"""
             cat_exists = cursor.execute(sql)
             if not cat_exists:
                 return json.dumps({"STATUS": "ERROR", "MSG": "Category not found", "CODE": 404})
 
-            if not fields["title"] or not fields["desc"] or not fields["price"] or \
-               not fields["img_url"] or not fields["favourite"]:
+            if not fields["title"] or not fields["descr"] or not fields["price"] or \
+               not fields["img_url"]:
                 return json.dumps({"STATUS": "ERROR", "MSG": "missing parameters", "CODE": 400})
 
-            sql = f"""SELECT * FROM products WHERE id = '{fields["id"]}'"""
+            sql = f"""SELECT * FROM products WHERE id = {fields["id"]}"""
             result = cursor.execute(sql)
 
             if not result:
-                print(fields["favourite"])
                 sql = f"""INSERT INTO products (title, descr, price, img_url, category, favourite) 
-                            VALUES ('{fields["title"]}', '{fields["desc"]}', '{fields["price"]}',
+                            VALUES ('{fields["title"]}', '{fields["descr"]}', '{fields["price"]}',
                                     '{fields["img_url"]}', '{fields["category"]}', '{fields["favourite"]}')
                         """ 
                 cursor.execute(sql)
@@ -87,18 +86,19 @@ def add_product(**fields):
 
             else:
                 for key, value in fields.items():
-                    sql = f"""UPDATE products SET {key} = '{value}' WHERE id = '{fields["id"]}' """ 
+                    sql = f"""UPDATE products SET {key} = '{value}' WHERE id = {fields["id"]} """ 
                     cursor.execute(sql)
                     conn.commit()
 
     except Exception as e:
-        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
+        print(repr(e))
+        return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})
 
 
 def get_product(id):
     try:
         with conn.cursor() as cursor:
-            query = f"""SELECT * FROM products WHERE id = '{id}'"""
+            query = f"""SELECT * FROM products WHERE id = {id}"""
             cursor.execute(query)
             result = cursor.fetchone()
 
@@ -108,7 +108,7 @@ def get_product(id):
                 return json.dumps({"STATUS": "SUCCESS", "PRODUCT": result, "CODE": 200})
 
     except Exception as e:
-        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
+        return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})
 
 
 def delete_product(id):
@@ -128,7 +128,7 @@ def delete_product(id):
 
             return json.dumps({"STATUS": "SUCCESS", "CODE": 201})
     except Exception as e:
-        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
+        return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})
 
 
 def list_products():
@@ -141,4 +141,23 @@ def list_products():
             return json.dumps({"STATUS": "SUCCESS", "PRODUCTS": result, "CODE": 200})
 
     except Exception as e:
-        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
+        return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})
+
+
+def list_products_by_category(id):
+    try:
+        with conn.cursor() as cursor:
+            query = f"""SELECT * FROM categories WHERE id = {id}"""
+            cat_exists = cursor.execute(query)
+
+            if not cat_exists:
+                return json.dumps({"STATUS": "ERROR", "MSG": "Category not found", "CODE": 404})
+
+            query = f"""SELECT * FROM products WHERE category = '{id}'"""
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+            return json.dumps({"STATUS": "SUCCESS", "PRODUCTS": result, "CODE": 200})
+
+    except Exception as e:
+        return json.dumps({"STATUS": "ERROR", "MSG": repr(e), "CODE": 500})

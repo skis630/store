@@ -42,7 +42,7 @@ def delete_category(id):
 
 @post("/product")
 def add_or_edit_product():
-    id = request.forms.get("id")
+    id = int(request.forms.get("id"))
     title = request.forms.get("title")
     desc = request.forms.get("desc")
     price = request.forms.get("price")
@@ -55,7 +55,7 @@ def add_or_edit_product():
     else:
         favourite = 1
     
-    return db.add_product(id=id, title=title, desc=desc, price=price, img_url=img_url, category=category, \
+    return db.add_product(id=id, title=title, descr=desc, price=price, img_url=img_url, category=category, \
                           favourite=favourite)
 
 @get("/product/<id:int>")
@@ -69,6 +69,10 @@ def delete_product(id):
 @get("/products")
 def get_products():
     return db.list_products()
+
+@get("/category/<id:int>/products")
+def list_category_products(id):
+    return db.list_products_by_category(id)
 
 
 run(host='localhost', port=7000, debug=True, reloader=True)
