@@ -130,3 +130,15 @@ def delete_product(id):
     except Exception as e:
         return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
 
+
+def list_products():
+    try:
+        with conn.cursor() as cursor:
+            query = f"""SELECT * FROM products"""
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+            return json.dumps({"STATUS": "SUCCESS", "PRODUCTS": result, "CODE": 200})
+
+    except Exception as e:
+        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})

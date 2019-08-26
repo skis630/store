@@ -64,7 +64,11 @@ def get_product(id):
 
 @delete("/product/<id:int>")
 def delete_product(id):
-    return 
+    return db.delete_product(id)
+
+@get("/products")
+def get_products():
+    return db.list_products()
 
 
 run(host='localhost', port=7000, debug=True, reloader=True)
