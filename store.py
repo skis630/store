@@ -4,6 +4,25 @@ import json
 import pymysql
 from db import db
 
+
+@get("/")
+def index():
+    return template("index.html")
+
+@get('/js/<filename:re:.*\.js>')
+def javascripts(filename):
+    return static_file(filename, root='js')
+
+
+@get('/css/<filename:re:.*\.css>')
+def stylesheets(filename):
+    return static_file(filename, root='css')
+
+
+@get('/images/<filename:re:.*\.(jpg|png|gif|ico)>')
+def images(filename):
+    return static_file(filename, root='images')
+
 @get("/admin")
 def admin_portal():
 	return template("pages/admin.html")
@@ -43,23 +62,9 @@ def add_or_edit_product():
 def get_product(id):
     return db.get_product(id)
 
-@get("/")
-def index():
-    return template("index.html")
-
-@get('/js/<filename:re:.*\.js>')
-def javascripts(filename):
-    return static_file(filename, root='js')
-
-
-@get('/css/<filename:re:.*\.css>')
-def stylesheets(filename):
-    return static_file(filename, root='css')
-
-
-@get('/images/<filename:re:.*\.(jpg|png|gif|ico)>')
-def images(filename):
-    return static_file(filename, root='images')
+@delete("/product/<id:int>")
+def delete_product(id):
+    return 
 
 
 run(host='localhost', port=7000, debug=True, reloader=True)

@@ -109,3 +109,24 @@ def get_product(id):
 
     except Exception as e:
         return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
+
+
+def delete_product(id):
+    try:
+        with conn.cursor() as cursor:
+            query = f"""SELECT * FROM products WHERE id = '{id}'"""
+            result = cursor.execute(query)
+
+            if not result:
+                return json.dumps({"STATUS": "ERROR", "MSG": "Product not found", "CODE": 404})
+
+            sql = f"""DELETE FROM products WHERE id = '{id}'"""
+            cursor.execute(sql)
+            conn.commit()
+
+            response.status = 201
+
+            return json.dumps({"STATUS": "SUCCESS", "CODE": 201})
+    except Exception as e:
+        return json.dumps({"STATUS": "ERROR", "MSG": str(e), "CODE": 500})
+
